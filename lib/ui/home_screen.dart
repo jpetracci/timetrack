@@ -43,12 +43,13 @@ class HomeScreen extends ConsumerWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final double maxWidth =
-                constraints.maxWidth < 720 ? constraints.maxWidth : 720;
-            const double outerPadding = 16;
-            const double cardPadding = 16;
-            const double sectionSpacing = 16;
-            const double smallSpacing = 8;
+            final double width = constraints.maxWidth;
+            final double maxWidth = width < 720 ? width : 720;
+            final bool isCompact = width < 360;
+            final double outerPadding = isCompact ? 12 : 16;
+            final double cardPadding = isCompact ? 12 : 16;
+            final double sectionSpacing = isCompact ? 12 : 16;
+            final double smallSpacing = isCompact ? 6 : 8;
 
             return Align(
               alignment: Alignment.topCenter,
