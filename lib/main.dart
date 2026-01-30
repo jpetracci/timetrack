@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'state/projects_state.dart';
 import 'state/timer_controller.dart';
+import 'ui/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,11 +31,7 @@ class TimeTrackApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('TimeTrack'),
-        ),
-      ),
+      home: const HomeScreen(),
     );
   }
 }
