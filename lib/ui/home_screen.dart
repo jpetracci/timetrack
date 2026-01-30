@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/project.dart';
 import '../state/projects_state.dart';
 import '../state/timer_controller.dart';
+import '../utils/decimal_time.dart';
 import '../widgets/new_project_sheet.dart';
+import '../widgets/project_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -58,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${_formatDecimalHours(timerState.elapsed, 2)}h',
+                        '${formatDecimalHours(timerState.elapsed, 2)}h',
                         style: Theme.of(context).textTheme.displaySmall,
                       ),
                     ],
@@ -82,31 +84,26 @@ class HomeScreen extends ConsumerWidget {
                           final Project project =
                               projectsState.projects[index];
                           final bool isActive =
-                              timerState.activeProjectId == project.id &&
-                                  timerState.isRunning;
+                              timerState.activeProjectId == project.id;
+                          final bool isRunning =
+                              isActive && timerState.isRunning;
+                          final Duration elapsed =
+                              isRunning ? timerState.elapsed : Duration.zero;
 
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: ListTile(
-                              onTap: () async {
-                                final timerController =
-                                    ref.read(timerControllerProvider.notifier);
-                                if (isActive) {
-                                  await timerController.stop();
-                                } else {
-                                  await timerController.start(project.id);
-                                }
-                              },
-                              title: Text(project.name),
-                              subtitle: Text(
-                                project.tags.isEmpty
-                                    ? 'No tags'
-                                    : project.tags.join(', '),
-                              ),
-                              trailing: Icon(
-                                isActive ? Icons.pause_circle : Icons.play_circle,
-                              ),
-                            ),
+                          return ProjectCard(
+                            project: project,
+                            isActive: isActive,
+                            isRunning: isRunning,
+                            elapsed: elapsed,
+                            onTap: () async {
+                              final timerController = ref
+                                  .read(timerControllerProvider.notifier);
+                              if (isRunning) {
+                                await timerController.stop();
+                              } else {
+                                await timerController.start(project.id);
+                              }
+                            },
                           );
                         },
                       ),
@@ -116,10 +113,5 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _formatDecimalHours(Duration duration, int precision) {
-    final double hours = duration.inSeconds / 3600;
-    return hours.toStringAsFixed(precision);
   }
 }
