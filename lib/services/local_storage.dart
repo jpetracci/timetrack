@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/project.dart';
@@ -84,6 +85,10 @@ class LocalStorage {
     await prefs.remove(_activeTimerKey);
   }
 }
+
+final localStorageProvider = Provider<LocalStorage>((ref) {
+  return LocalStorage();
+});
 
 class ActiveTimerSnapshot {
   const ActiveTimerSnapshot({
