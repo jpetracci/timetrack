@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Flutter scaffold + models + SharedPreferences storage
 - [x] 01-02-PLAN.md — Timer logic + auto-stop switching + persistence restore
-- [ ] 01-03-PLAN.md — Core UI with project list, add project, and timer controls
+- [x] 01-03-PLAN.md — Core UI with project list, add project, and timer controls
 
 ### Phase 2: Cross-Platform
 **Goal**: Deploy to iOS, Android, and web with background timer support
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In progress | - |
+| 1. Foundation | 3/3 | Complete | 2026-01-30 |
 | 2. Cross-Platform | 0/3 | Not started | - |
 | 3. User Interface | 0/3 | Not started | - |
 | 4. Project Management | 0/3 | Not started | - |
@@ -132,4 +132,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-01-30 after 01-01 execution*
+*Last updated: 2026-01-30 after 01-03 execution*
