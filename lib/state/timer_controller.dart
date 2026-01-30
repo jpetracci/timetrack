@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/time_entry.dart';
+import '../services/local_storage.dart';
 import 'projects_state.dart';
 import 'timer_state.dart';
 
@@ -11,6 +12,7 @@ class TimerController extends Notifier<TimerState> {
   final Uuid _uuid = const Uuid();
   Timer? _ticker;
 
+  LocalStorage get _storage => ref.read(localStorageProvider);
   ProjectsController get _projectsController =>
       ref.read(projectsControllerProvider.notifier);
 
@@ -18,6 +20,32 @@ class TimerController extends Notifier<TimerState> {
   TimerState build() {
     ref.onDispose(_stopTicker);
     return TimerState.initial();
+  }
+
+  Future<void> hydrate() async {
+    final List<TimeEntry> entries = await _storage.loadEntries();
+    final ActiveTimerSnapshot? snapshot = await _storage.loadActiveTimer();
+    if (snapshot == null) {
+      state = state.copyWith(entries: entries);
+      return;
+    }
+
+    final DateTime now = DateTime.now();
+    final TimeEntry runningEntry = TimeEntry(
+      id: _uuid.v4(),
+      projectId: snapshot.projectId,
+      start: snapshot.start,
+    );
+
+    state = state.copyWith(
+      entries: entries,
+      runningEntry: runningEntry,
+      activeProjectId: snapshot.projectId,
+      startTime: snapshot.start,
+      elapsed: now.difference(snapshot.start),
+    );
+    _projectsController.setActiveProject(snapshot.projectId);
+    _startTicker();
   }
 
   Future<void> start(String projectId) async {
@@ -43,6 +71,8 @@ class TimerController extends Notifier<TimerState> {
       elapsed: Duration.zero,
     );
 
+    await _storage.saveEntries(state.entries);
+    await _storage.saveActiveTimer(projectId: projectId, start: now);
     _projectsController.setActiveProject(projectId);
     _startTicker();
   }
@@ -65,6 +95,8 @@ class TimerController extends Notifier<TimerState> {
       elapsed: Duration.zero,
     );
 
+    await _storage.saveEntries(updatedEntries);
+    await _storage.clearActiveTimer();
     _projectsController.setActiveProject(null);
   }
 

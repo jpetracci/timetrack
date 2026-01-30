@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
-  runApp(const ProviderScope(child: TimeTrackApp()));
+import 'state/projects_state.dart';
+import 'state/timer_controller.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final ProviderContainer container = ProviderContainer();
+
+  await container.read(projectsControllerProvider.notifier).loadProjects();
+  await container.read(timerControllerProvider.notifier).hydrate();
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const TimeTrackApp(),
+    ),
+  );
 }
 
 class TimeTrackApp extends StatelessWidget {
