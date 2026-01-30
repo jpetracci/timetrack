@@ -49,9 +49,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Configure platform-specific build settings and permissions
-- [ ] 02-02: Implement background timer with proper lifecycle management
-- [ ] 02-03: Create responsive layout foundation for all platforms
+- [ ] 02-01-PLAN.md — Align platform metadata and minimum OS targets
+- [ ] 02-02-PLAN.md — Add lifecycle-aware background timer handling
+- [ ] 02-03-PLAN.md — Establish responsive layout foundation
 
 ### Phase 3: User Interface
 **Goal**: Polished UX with prominent timer display and intuitive controls
