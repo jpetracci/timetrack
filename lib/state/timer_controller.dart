@@ -30,7 +30,6 @@ class TimerController extends Notifier<TimerState> {
       return;
     }
 
-    final DateTime now = DateTime.now();
     final TimeEntry runningEntry = TimeEntry(
       id: _uuid.v4(),
       projectId: snapshot.projectId,
@@ -42,7 +41,7 @@ class TimerController extends Notifier<TimerState> {
       runningEntry: runningEntry,
       activeProjectId: snapshot.projectId,
       startTime: snapshot.start,
-      elapsed: now.difference(snapshot.start),
+      elapsed: _elapsedFromStart(snapshot.start),
     );
     _projectsController.setActiveProject(snapshot.projectId);
     _startTicker();
@@ -68,7 +67,7 @@ class TimerController extends Notifier<TimerState> {
       runningEntry: runningEntry,
       activeProjectId: projectId,
       startTime: now,
-      elapsed: Duration.zero,
+      elapsed: _elapsedFromStart(now),
     );
 
     await _storage.saveEntries(state.entries);
@@ -114,20 +113,41 @@ class TimerController extends Notifier<TimerState> {
     await start(projectId);
   }
 
+  void handleAppPaused() {
+    _stopTicker();
+  }
+
+  void handleAppResumed() {
+    if (!state.isRunning || state.startTime == null) {
+      return;
+    }
+    state = state.copyWith(elapsed: _elapsedFromStart(state.startTime));
+    _startTicker();
+  }
+
   void _startTicker() {
     _stopTicker();
+    state = state.copyWith(elapsed: _elapsedFromStart(state.startTime));
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      final DateTime? startTime = state.startTime;
-      if (startTime == null) {
-        return;
-      }
-      state = state.copyWith(elapsed: DateTime.now().difference(startTime));
+      state = state.copyWith(elapsed: _elapsedFromStart(state.startTime));
     });
   }
 
   void _stopTicker() {
     _ticker?.cancel();
     _ticker = null;
+  }
+
+  Duration _elapsedFromStart(DateTime? startTime) {
+    if (startTime == null) {
+      return Duration.zero;
+    }
+
+    final Duration elapsed = DateTime.now().difference(startTime);
+    if (elapsed.isNegative) {
+      return Duration.zero;
+    }
+    return elapsed;
   }
 
 }
