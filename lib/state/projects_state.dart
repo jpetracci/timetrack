@@ -5,6 +5,7 @@ import '../models/project.dart';
 import '../services/local_storage.dart';
 
 class ProjectsState {
+  static const Object _unset = Object();
   const ProjectsState({
     required this.projects,
     required this.activeProjectId,
@@ -22,11 +23,13 @@ class ProjectsState {
 
   ProjectsState copyWith({
     List<Project>? projects,
-    String? activeProjectId,
+    Object? activeProjectId = _unset,
   }) {
     return ProjectsState(
       projects: projects ?? this.projects,
-      activeProjectId: activeProjectId ?? this.activeProjectId,
+      activeProjectId: activeProjectId == _unset
+          ? this.activeProjectId
+          : activeProjectId as String?,
     );
   }
 }

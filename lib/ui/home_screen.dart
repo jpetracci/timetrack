@@ -51,20 +51,36 @@ class HomeScreen extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        activeProject?.name ?? 'No active project',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${formatDecimalHours(timerState.elapsed, 2)}h',
-                        style: Theme.of(context).textTheme.displaySmall,
-                      ),
-                    ],
-                  ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                activeProject?.name ?? 'No active project',
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                            if (timerState.isRunning)
+                              TextButton.icon(
+                                onPressed: () async {
+                                  await ref
+                                      .read(timerControllerProvider.notifier)
+                                      .stop();
+                                },
+                                icon: const Icon(Icons.stop),
+                                label: const Text('Stop'),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${formatDecimalHours(timerState.elapsed, 2)}h',
+                          style: Theme.of(context).textTheme.displaySmall,
+                        ),
+                      ],
+                    ),
                 ),
               ),
               const SizedBox(height: 16),
