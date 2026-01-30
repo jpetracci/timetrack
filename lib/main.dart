@@ -20,8 +20,44 @@ Future<void> main() async {
   );
 }
 
-class TimeTrackApp extends StatelessWidget {
+class TimeTrackApp extends ConsumerStatefulWidget {
   const TimeTrackApp({super.key});
+
+  @override
+  ConsumerState<TimeTrackApp> createState() => _TimeTrackAppState();
+}
+
+class _TimeTrackAppState extends ConsumerState<TimeTrackApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final TimerController controller =
+        ref.read(timerControllerProvider.notifier);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        controller.handleAppResumed();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+        controller.handleAppPaused();
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

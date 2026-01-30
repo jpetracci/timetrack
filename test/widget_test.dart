@@ -6,12 +6,13 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:timetrack/main.dart';
 
 void main() {
   testWidgets('App loads with title text', (WidgetTester tester) async {
-    await tester.pumpWidget(const TimeTrackApp());
+    await tester.pumpWidget(const ProviderScope(child: TimeTrackApp()));
 
     expect(find.text('TimeTrack'), findsOneWidget);
   });
