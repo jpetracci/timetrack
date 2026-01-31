@@ -81,9 +81,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Implement project edit and delete functionality
-- [ ] 04-02: Create project archival system with archive management
-- [ ] 04-03: Build time history interface with inline editing capabilities
+- [ ] 04-01-PLAN.md — Project details with edit + delete flows
+- [ ] 04-02-PLAN.md — Project archival + archive management screen
+- [ ] 04-03-PLAN.md — Time history UI with inline edit/delete
 
 ### Phase 5: Reporting
 **Goal: Daily/weekly reports with data export and persistence
