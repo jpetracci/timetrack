@@ -21,7 +21,6 @@ class TouchOptimizedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double minSize = PlatformDetector.minimumTouchTarget;
-    final bool isDisabled = onPressed == null;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -63,7 +62,6 @@ class TouchOptimizedIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double minSize = PlatformDetector.minimumTouchTarget;
-    final bool isDisabled = onPressed == null;
 
     return ConstrainedBox(
       constraints: BoxConstraints(

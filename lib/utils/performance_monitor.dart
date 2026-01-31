@@ -1,11 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_performance_monitor_plus/flutter_performance_monitor_plus.dart';
 
 /// Performance monitoring wrapper that activates only in debug mode
 /// 
-/// This widget wraps the app with performance monitoring overlay
-/// when running in debug mode, providing real-time metrics.
+/// This widget tracks performance metrics when running in debug mode.
 /// In release mode, it renders the child without any overhead.
 class PerformanceMonitor extends StatelessWidget {
   const PerformanceMonitor({
@@ -17,25 +15,13 @@ class PerformanceMonitor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Only enable performance monitoring in debug mode
+    // In debug mode, track performance metrics
     if (kDebugMode) {
-      return Stack(
-        children: [
-          child,
-          // Performance overlay positioned in top-right corner
-          Positioned(
-            top: 50,
-            right: 10,
-            child: PerformanceMonitorPlus(
-              child: Container(), // Required child parameter
-            ),
-          ),
-        ],
-      );
-    } else {
-      // In release mode, just return the child without monitoring overhead
-      return child;
+      // Log that performance monitoring is active
+      PerformanceTracker.trackWidgetBuild('PerformanceMonitor');
     }
+    
+    return child;
   }
 }
 
