@@ -5,6 +5,7 @@ import '../models/time_entry.dart';
 import '../state/timer_controller.dart';
 import '../utils/decimal_time.dart';
 import '../utils/platform_detector.dart';
+import '../utils/accessibility_helpers.dart';
 import '../widgets/touch_optimized_button.dart';
 import '../widgets/hover_wrapper.dart';
 
@@ -27,125 +28,139 @@ class TimeEntryTile extends ConsumerWidget {
         entry.end == null ? 'Running' : _formatTime(context, entry.end!);
     final String durationLabel = formatDecimalHours(entry.duration, precision);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        border: Border.all(color: colors.outlineVariant),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Text(
-                dateLabel,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const Spacer(),
-              if (entry.isRunning)
+    // Create semantic label for screen readers
+    final String semanticLabel = AccessibilityHelpers.timeEntryLabel(
+      'Time entry',
+      durationLabel,
+      entry.isRunning,
+    );
+
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      hint: entry.isRunning 
+          ? 'Currently running timer, tap to view options'
+          : 'Completed time entry, tap to view options',
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          border: Border.all(color: colors.outlineVariant),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
                 Text(
-                  'Running',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.primary,
+                  dateLabel,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const Spacer(),
+                if (entry.isRunning)
+                  Text(
+                    'Running',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.primary,
+                        ),
+                  ),
+                if (entry.isRunning) const SizedBox(width: 8),
+                Text(
+                  durationLabel,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        startTime,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
+                      Text(
+                        'Start',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
-              if (entry.isRunning) const SizedBox(width: 8),
-              Text(
-                durationLabel,
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      startTime,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Text(
-                      'Start',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Text(
+                        endTime,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Text(
+                        entry.end == null ? 'Running' : 'End',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      endTime,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Text(
-                      entry.end == null ? 'Running' : 'End',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              const Spacer(),
-              // Platform-adaptive edit button
-              PlatformDetector.isTouchDevice
-                  ? TouchOptimizedIconButton(
-                      onPressed: entry.isRunning
-                          ? null
-                          : () => _showEditSheet(context, ref),
-                      icon: const Icon(Icons.edit_outlined),
-                      tooltip: 'Edit duration',
-                      size: 24,
-                    )
-                  : HoverWrapper(
-                      cursor: SystemMouseCursors.click,
-                      hoverScale: 1.15,
-                      child: IconButton(
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                const Spacer(),
+                // Platform-adaptive edit button with accessibility
+                PlatformDetector.isTouchDevice
+                    ? TouchOptimizedIconButton(
                         onPressed: entry.isRunning
                             ? null
                             : () => _showEditSheet(context, ref),
                         icon: const Icon(Icons.edit_outlined),
                         tooltip: 'Edit duration',
-                        visualDensity: VisualDensity.compact,
+                        size: 24,
+                      )
+                    : HoverWrapper(
+                        cursor: SystemMouseCursors.click,
+                        hoverScale: 1.15,
+                        child: AccessibleIconButton(
+                          onPressed: entry.isRunning
+                              ? null
+                              : () => _showEditSheet(context, ref),
+                          semanticLabel: AccessibilityHelpers.timeEntryActionHint('edit', 'Time entry'),
+                          icon: const Icon(Icons.edit_outlined),
+                          tooltip: 'Edit duration',
+                        ),
                       ),
-                    ),
-              const SizedBox(width: 8),
-              // Platform-adaptive delete button
-              PlatformDetector.isTouchDevice
-                  ? TouchOptimizedIconButton(
-                      onPressed: entry.isRunning
-                          ? null
-                          : () => _confirmDelete(context, ref),
-                      icon: const Icon(Icons.delete_outline),
-                      tooltip: 'Delete entry',
-                      size: 24,
-                    )
-                  : HoverWrapper(
-                      cursor: SystemMouseCursors.click,
-                      hoverScale: 1.15,
-                      child: IconButton(
+                const SizedBox(width: 8),
+                // Platform-adaptive delete button with accessibility
+                PlatformDetector.isTouchDevice
+                    ? TouchOptimizedIconButton(
                         onPressed: entry.isRunning
                             ? null
                             : () => _confirmDelete(context, ref),
                         icon: const Icon(Icons.delete_outline),
                         tooltip: 'Delete entry',
-                        visualDensity: VisualDensity.compact,
+                        size: 24,
+                      )
+                    : HoverWrapper(
+                        cursor: SystemMouseCursors.click,
+                        hoverScale: 1.15,
+                        child: AccessibleIconButton(
+                          onPressed: entry.isRunning
+                              ? null
+                              : () => _confirmDelete(context, ref),
+                          semanticLabel: AccessibilityHelpers.timeEntryActionHint('delete', 'Time entry'),
+                          icon: const Icon(Icons.delete_outline),
+                          tooltip: 'Delete entry',
+                        ),
                       ),
-                    ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

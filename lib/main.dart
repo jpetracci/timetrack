@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'state/projects_state.dart';
 import 'state/settings_controller.dart';
 import 'state/timer_controller.dart';
+import 'utils/performance_monitor.dart';
 import 'ui/home_screen.dart';
 
 void main() {
@@ -63,13 +64,15 @@ class _TimeTrackAppState extends ConsumerState<TimeTrackApp>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TimeTrack',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-        useMaterial3: true,
+    return PerformanceMonitor(
+      child: MaterialApp(
+        title: 'TimeTrack',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+          useMaterial3: true,
+        ),
+        home: const HomeScreen(),
       ),
-      home: const HomeScreen(),
     );
   }
 }
