@@ -35,17 +35,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Reporting
 
-- [ ] **REPT-01**: User can view daily time report (simple table format)
-- [ ] **REPT-02**: User can view weekly time report (simple table format)
-- [ ] **REPT-03**: Reports show project totals and daily breakdowns
-- [ ] **REPT-04**: Reports can be filtered by date range
+ - [x] **REPT-01**: User can view daily time report (simple table format)
+ - [x] **REPT-02**: User can view weekly time report (simple table format)
+ - [x] **REPT-03**: Reports show project totals and daily breakdowns
+ - [x] **REPT-04**: Reports can be filtered by date range
 
 ### Data Storage
 
  - [x] **STOR-01**: All data stored locally on device (no network dependency)
-- [ ] **STOR-02**: Data persists across app updates
-- [ ] **STOR-03**: User can export data as JSON/CSV
-- [ ] **STOR-04**: Data migration handled when app schema changes
+ - [x] **STOR-02**: Data persists across app updates
+ - [x] **STOR-03**: User can export data as JSON/CSV
+ - [x] **STOR-04**: Data migration handled when app schema changes
 
 ### Platform Support
 
@@ -127,13 +127,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISP-04 | Phase 4 | Complete |
 | DISP-05 | Phase 4 | Complete |
 | DISP-06 | Phase 4 | Complete |
-| REPT-01 | Phase 5 | Pending |
-| REPT-02 | Phase 5 | Pending |
-| REPT-03 | Phase 5 | Pending |
-| REPT-04 | Phase 5 | Pending |
-| STOR-02 | Phase 5 | Pending |
-| STOR-03 | Phase 5 | Pending |
-| STOR-04 | Phase 5 | Pending |
+| REPT-01 | Phase 5 | Complete |
+| REPT-02 | Phase 5 | Complete |
+| REPT-03 | Phase 5 | Complete |
+| REPT-04 | Phase 5 | Complete |
+| STOR-02 | Phase 5 | Complete |
+| STOR-03 | Phase 5 | Complete |
+| STOR-04 | Phase 5 | Complete |
 | PLAT-04 | Phase 6 | Pending |
 | PLAT-05 | Phase 6 | Pending |
 
