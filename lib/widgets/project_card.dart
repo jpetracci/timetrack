@@ -26,67 +26,107 @@ class ProjectCard extends ConsumerWidget {
     final int precision = ref.watch(
       settingsControllerProvider.select((state) => state.precision),
     );
-    final Color? background = isActive
-        ? Theme.of(context).colorScheme.primaryContainer
-        : null;
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    const Duration animationDuration = Duration(milliseconds: 200);
+    final bool isEmphasized = isActive || isRunning;
+    final Color background =
+        isEmphasized ? colors.primaryContainer : colors.surface;
+    final Color borderColor =
+        isEmphasized ? colors.primary : colors.outlineVariant;
+    final BorderRadius borderRadius = BorderRadius.circular(12);
+    final List<BoxShadow> shadows = isEmphasized
+        ? <BoxShadow>[
+            BoxShadow(
+              color: colors.primary.withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ]
+        : const <BoxShadow>[];
 
-    return Card(
-      color: background,
+    return AnimatedContainer(
+      duration: animationDuration,
+      curve: Curves.easeOutCubic,
       margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: borderRadius,
+        border: Border.all(color: borderColor),
+        boxShadow: shadows,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: borderRadius,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        project.name,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      if (project.tags.isEmpty)
+                        Text(
+                          'No tags',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        )
+                      else
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: project.tags
+                              .map(
+                                (String tag) => Chip(
+                                  label: Text(tag),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                              )
+                              .toList(),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      project.name,
+                      formatDecimalHours(elapsed, precision),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 8),
-                    if (project.tags.isEmpty)
-                      Text(
-                        'No tags',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      )
-                    else
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: project.tags
-                            .map(
-                              (String tag) => Chip(
-                                label: Text(tag),
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            )
-                            .toList(),
+                    const SizedBox(height: 4),
+                    AnimatedSwitcher(
+                      duration: animationDuration,
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      child: Text(
+                        isRunning ? 'Running' : 'Stopped',
+                        key: ValueKey<bool>(isRunning),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: isRunning
+                                  ? colors.primary
+                                  : colors.onSurfaceVariant,
+                            ),
                       ),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    formatDecimalHours(elapsed, precision),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    isRunning ? 'Running' : 'Stopped',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
