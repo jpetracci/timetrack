@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/settings_controller.dart';
 import '../../state/settings_state.dart';
+import '../../state/projects_state.dart';
+import '../../state/timer_controller.dart';
+import '../../services/report_export_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -72,8 +75,89 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Data export',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Export all your projects and time entries for backup or analysis.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _exportData(ExportFormat.json, ref, context),
+                        icon: const Icon(Icons.code),
+                        label: const Text('Export JSON'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _exportData(ExportFormat.csv, ref, context),
+                        icon: const Icon(Icons.table_chart),
+                        label: const Text('Export CSV'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _exportData(ExportFormat format, WidgetRef ref, BuildContext context) async {
+    try {
+      final projectsState = ref.read(projectsControllerProvider);
+      final timerState = ref.read(timerControllerProvider);
+      
+      final projects = projectsState.projects;
+      final entries = [...timerState.entries];
+      
+      // Include running entry if present
+      if (timerState.runningEntry != null) {
+        entries.add(timerState.runningEntry!);
+      }
+
+      await ReportExportService.exportAll(
+        format: format,
+        projects: projects,
+        entries: entries,
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Exported ${format.name.toUpperCase()} successfully'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }
