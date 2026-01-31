@@ -5,17 +5,11 @@ import 'state/projects_state.dart';
 import 'state/timer_controller.dart';
 import 'ui/home_screen.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final ProviderContainer container = ProviderContainer();
-
-  await container.read(projectsControllerProvider.notifier).loadProjects();
-  await container.read(timerControllerProvider.notifier).hydrate();
-
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const TimeTrackApp(),
+    const ProviderScope(
+      child: TimeTrackApp(),
     ),
   );
 }
@@ -33,6 +27,12 @@ class _TimeTrackAppState extends ConsumerState<TimeTrackApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future(() async {
+        await ref.read(projectsControllerProvider.notifier).loadProjects();
+        await ref.read(timerControllerProvider.notifier).hydrate();
+      });
+    });
   }
 
   @override
