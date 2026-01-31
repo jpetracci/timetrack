@@ -65,6 +65,28 @@ class ProjectsController extends Notifier<ProjectsState> {
     return project;
   }
 
+  Future<void> updateProject({
+    required String projectId,
+    required String name,
+    required List<String> tags,
+  }) async {
+    bool found = false;
+    final List<Project> updated = state.projects.map((Project project) {
+      if (project.id == projectId) {
+        found = true;
+        return project.copyWith(name: name, tags: tags);
+      }
+      return project;
+    }).toList();
+
+    if (!found) {
+      throw StateError('Project not found');
+    }
+
+    state = state.copyWith(projects: updated);
+    await _storage.saveProjects(updated);
+  }
+
   void setActiveProject(String? projectId) {
     state = state.copyWith(activeProjectId: projectId);
   }

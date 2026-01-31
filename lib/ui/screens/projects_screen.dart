@@ -5,6 +5,7 @@ import '../../models/project.dart';
 import '../../state/projects_state.dart';
 import '../../state/timer_controller.dart';
 import '../../widgets/project_card.dart';
+import 'project_details_screen.dart';
 import '../widgets/timer_header.dart';
 
 class ProjectsScreen extends ConsumerWidget {
@@ -133,6 +134,15 @@ class ProjectsScreen extends ConsumerWidget {
                                         }
                                       }
                                     }
+                                  },
+                                  onDetailsTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => ProjectDetailsScreen(
+                                          projectId: project.id,
+                                        ),
+                                      ),
+                                    );
                                   },
                                 );
                               },

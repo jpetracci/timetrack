@@ -13,6 +13,7 @@ class ProjectCard extends ConsumerWidget {
     required this.isRunning,
     required this.elapsed,
     required this.onTap,
+    required this.onDetailsTap,
   });
 
   final Project project;
@@ -20,6 +21,7 @@ class ProjectCard extends ConsumerWidget {
   final bool isRunning;
   final Duration elapsed;
   final VoidCallback onTap;
+  final VoidCallback onDetailsTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -122,6 +124,14 @@ class ProjectCard extends ConsumerWidget {
                                   : colors.onSurfaceVariant,
                             ),
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    IconButton(
+                      onPressed: onDetailsTap,
+                      icon: const Icon(Icons.info_outline),
+                      tooltip: 'Details',
+                      iconSize: 20,
+                      visualDensity: VisualDensity.compact,
                     ),
                   ],
                 ),
