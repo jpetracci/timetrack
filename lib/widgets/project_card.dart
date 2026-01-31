@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 
 import '../models/project.dart';
 import '../state/settings_controller.dart';
@@ -26,6 +27,12 @@ class ProjectCard extends ConsumerWidget {
   final Duration elapsed;
   final VoidCallback onTap;
   final VoidCallback onDetailsTap;
+
+  static final Map<String, FocusNode> _focusNodes = {};
+  
+  FocusNode _getFocusNode() {
+    return _focusNodes.putIfAbsent(project.id, () => FocusNode(debugLabel: 'ProjectCard_${project.name}'));
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,149 +68,198 @@ class ProjectCard extends ConsumerWidget {
         : 'Tap to start timer for ${project.name}';
     final String semanticDescription = '$semanticLabel. Elapsed time: ${formatDecimalHours(elapsed, precision)}. $semanticHint';
 
-    // Platform-adaptive card content with semantic wrapper
-    Widget cardContent = Semantics(
-      button: true,
-      label: semanticDescription,
-      hint: semanticHint,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    // Platform-adaptive card content with semantic wrapper and focus management
+    Widget cardContent = Focus(
+      focusNode: _getFocusNode(),
+      autofocus: false,
+      onKeyEvent: (FocusNode node, KeyEvent event) {
+        // Handle Enter and Space keys for card activation
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.enter || 
+              event.logicalKey == LogicalKeyboardKey.space) {
+            onTap();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Semantics(
+        button: true,
+        label: semanticDescription,
+        hint: semanticHint,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      project.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    if (project.tags.isEmpty)
+                      Text(
+                        'No tags',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    else
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: project.tags
+                            .map(
+                              (String tag) => Chip(
+                                label: Text(tag),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            )
+                            .toList(),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    project.name,
+                    formatDecimalHours(elapsed, precision),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 8),
-                  if (project.tags.isEmpty)
-                    Text(
-                      'No tags',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    )
-                  else
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: project.tags
-                          .map(
-                            (String tag) => Chip(
-                              label: Text(tag),
-                              visualDensity: VisualDensity.compact,
-                            ),
-                          )
-                          .toList(),
+                  const SizedBox(height: 4),
+                  AnimatedSwitcher(
+                    duration: animationDuration,
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    child: Text(
+                      isRunning ? 'Running' : 'Stopped',
+                      key: ValueKey<bool>(isRunning),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: isRunning
+                                ? colors.primary
+                                : colors.onSurfaceVariant,
+                          ),
                     ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Text(
-                  formatDecimalHours(elapsed, precision),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 4),
-                AnimatedSwitcher(
-                  duration: animationDuration,
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
-                  },
-                  child: Text(
-                    isRunning ? 'Running' : 'Stopped',
-                    key: ValueKey<bool>(isRunning),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isRunning
-                              ? colors.primary
-                              : colors.onSurfaceVariant,
-                        ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                // Platform-adaptive details button with semantic properties
-                PlatformDetector.isTouchDevice
-                    ? Semantics(
-                        button: true,
-                        label: 'View details for ${project.name}',
-                        hint: 'Tap to see project details and time history',
-                        child: TouchOptimizedIconButton(
-                          onPressed: onDetailsTap,
-                          icon: const Icon(Icons.info_outline),
-                          tooltip: 'Details',
-                          size: 20,
-                        ),
-                      )
-                    : Semantics(
-                        button: true,
-                        label: 'View details for ${project.name}',
-                        hint: 'Tap to see project details and time history',
-                        child: HoverWrapper(
-                          cursor: SystemMouseCursors.click,
-                          hoverScale: 1.1,
-                          child: IconButton(
+                  const SizedBox(height: 6),
+                  // Platform-adaptive details button with semantic properties
+                  PlatformDetector.isTouchDevice
+                      ? Semantics(
+                          button: true,
+                          label: 'View details for ${project.name}',
+                          hint: 'Tap to see project details and time history',
+                          child: TouchOptimizedIconButton(
                             onPressed: onDetailsTap,
                             icon: const Icon(Icons.info_outline),
                             tooltip: 'Details',
-                            iconSize: 20,
-                            visualDensity: VisualDensity.compact,
+                            size: 20,
+                          ),
+                        )
+                      : Semantics(
+                          button: true,
+                          label: 'View details for ${project.name}',
+                          hint: 'Tap to see project details and time history',
+                          child: HoverWrapper(
+                            cursor: SystemMouseCursors.click,
+                            hoverScale: 1.1,
+                            child: IconButton(
+                              onPressed: onDetailsTap,
+                              icon: const Icon(Icons.info_outline),
+                              tooltip: 'Details',
+                              iconSize: 20,
+                              visualDensity: VisualDensity.compact,
+                            ),
                           ),
                         ),
-                      ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
 
-    // Apply platform-specific wrapper
-    if (PlatformDetector.isTouchDevice) {
-      return TouchOptimizedCard(
-        onTap: onTap,
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: EdgeInsets.zero, // Padding is handled in cardContent
-        borderRadius: borderRadius,
-        child: AnimatedContainer(
-          duration: animationDuration,
-          curve: Curves.easeOutCubic,
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: borderRadius,
-            border: Border.all(color: borderColor),
-            boxShadow: shadows,
-          ),
-          child: cardContent,
-        ),
-      );
-    } else {
-      return HoverCard(
-        onTap: onTap,
-        margin: const EdgeInsets.only(bottom: 12),
-        borderRadius: borderRadius,
-        hoverElevation: 8.0,
-        hoverScale: 1.02,
-        child: AnimatedContainer(
-          duration: animationDuration,
-          curve: Curves.easeOutCubic,
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: borderRadius,
-            border: Border.all(color: borderColor),
-          ),
-          child: cardContent,
-        ),
-      );
-    }
+    // Platform-specific wrapper with focus management
+    final FocusNode cardFocusNode = _getFocusNode();
+    
+    return Focus(
+      focusNode: cardFocusNode,
+      canRequestFocus: !PlatformDetector.isTouchDevice, // Only allow focus on non-touch devices
+      onKeyEvent: (FocusNode node, KeyEvent event) {
+        // Handle keyboard navigation for the entire card
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.enter || 
+              event.logicalKey == LogicalKeyboardKey.space) {
+            onTap();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Builder(
+        builder: (context) {
+          final bool isFocused = Focus.of(context).hasFocus;
+          final Border focusBorder = Border.all(
+            color: colors.primary,
+            width: 2.0,
+          );
+          
+          if (PlatformDetector.isTouchDevice) {
+            return TouchOptimizedCard(
+              onTap: onTap,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.zero, // Padding is handled in cardContent
+              borderRadius: borderRadius,
+              child: AnimatedContainer(
+                duration: animationDuration,
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: background,
+                  borderRadius: borderRadius,
+                  border: isFocused ? focusBorder : Border.all(color: borderColor),
+                  boxShadow: shadows,
+                ),
+                child: cardContent,
+              ),
+            );
+          } else {
+            return HoverCard(
+              onTap: onTap,
+              margin: const EdgeInsets.only(bottom: 12),
+              borderRadius: borderRadius,
+              hoverElevation: 8.0,
+              hoverScale: 1.02,
+              child: AnimatedContainer(
+                duration: animationDuration,
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: background,
+                  borderRadius: borderRadius,
+                  border: isFocused ? focusBorder : Border.all(color: borderColor),
+                  boxShadow: isFocused ? <BoxShadow>[
+                    BoxShadow(
+                      color: colors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
+                ),
+                child: cardContent,
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 }
