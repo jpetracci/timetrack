@@ -111,6 +111,45 @@ class TimerController extends Notifier<TimerState> {
     await _storage.saveEntries(updatedEntries);
   }
 
+  Future<void> updateEntryDuration(
+    String entryId,
+    Duration newDuration,
+  ) async {
+    if (newDuration <= Duration.zero) {
+      throw ArgumentError('Duration must be greater than zero.');
+    }
+
+    final int entryIndex =
+        state.entries.indexWhere((TimeEntry entry) => entry.id == entryId);
+    if (entryIndex == -1) {
+      return;
+    }
+
+    final TimeEntry entry = state.entries[entryIndex];
+    if (entry.isRunning) {
+      return;
+    }
+
+    final DateTime newEnd = entry.start.add(newDuration);
+    final TimeEntry updatedEntry = entry.copyWith(end: newEnd);
+    final List<TimeEntry> updatedEntries = [...state.entries];
+    updatedEntries[entryIndex] = updatedEntry;
+
+    state = state.copyWith(entries: updatedEntries);
+    await _storage.saveEntries(updatedEntries);
+  }
+
+  Future<void> deleteEntry(String entryId) async {
+    final List<TimeEntry> updatedEntries = state.entries
+        .where((TimeEntry entry) => entry.id != entryId)
+        .toList();
+    if (updatedEntries.length == state.entries.length) {
+      return;
+    }
+    state = state.copyWith(entries: updatedEntries);
+    await _storage.saveEntries(updatedEntries);
+  }
+
   Future<void> switchTo(String projectId) async {
     if (!state.isRunning) {
       await start(projectId);
