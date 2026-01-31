@@ -103,9 +103,35 @@ class ProjectsScreen extends ConsumerWidget {
                                       timerControllerProvider.notifier,
                                     );
                                     if (isRunning) {
-                                      await timerController.stop();
+                                      try {
+                                        await timerController.stop();
+                                      } catch (_) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Could not stop timer.',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
                                     } else {
-                                      await timerController.start(project.id);
+                                      try {
+                                        await timerController.start(project.id);
+                                      } catch (_) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Could not start timer.',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
                                     }
                                   },
                                 );
