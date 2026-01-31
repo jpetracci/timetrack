@@ -6,6 +6,7 @@ import '../../models/time_entry.dart';
 import '../../state/projects_state.dart';
 import '../../state/settings_controller.dart';
 import '../../state/timer_controller.dart';
+import '../../utils/performance_monitor.dart';
 import '../../widgets/project_edit_sheet.dart';
 import '../../widgets/time_entry_tile.dart';
 
@@ -16,14 +17,11 @@ class ProjectDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ProjectsState projectsState = ref.watch(projectsControllerProvider);
-    Project? project;
-    for (final Project candidate in projectsState.projects) {
-      if (candidate.id == projectId) {
-        project = candidate;
-        break;
-      }
-    }
+    final Project? project = ref.watch(
+      projectsControllerProvider.select((state) => 
+        state.projects.where((p) => p.id == projectId).firstOrNull
+      ),
+    );
 
     if (project == null) {
       return Scaffold(
@@ -38,15 +36,19 @@ class ProjectDetailsScreen extends ConsumerWidget {
     final int precision = ref.watch(
       settingsControllerProvider.select((state) => state.precision),
     );
-    final bool isRunningForProject = timerState.isRunning &&
-        timerState.activeProjectId == currentProject.id;
-    final List<TimeEntry> projectEntries = timerState.entries
-        .where((TimeEntry entry) => entry.projectId == currentProject.id)
-        .toList()
-      ..sort(
-        (TimeEntry a, TimeEntry b) =>
-            _entrySortKey(b).compareTo(_entrySortKey(a)),
-      );
+    final bool isRunningForProject = ref.watch(
+      timerControllerProvider.select((state) => 
+        state.isRunning && state.activeProjectId == currentProject.id
+      ),
+    );
+    final List<TimeEntry> projectEntries = ref.watch(
+      timerControllerProvider.select((state) => 
+        state.entries
+          .where((TimeEntry entry) => entry.projectId == currentProject.id)
+          .toList()
+          ..sort((TimeEntry a, TimeEntry b) => _entrySortKey(b).compareTo(_entrySortKey(a)))
+      ),
+    );
     final TimeEntry? runningEntry = timerState.runningEntry;
     final List<TimeEntry> displayEntries = <TimeEntry>[
       if (runningEntry != null &&
@@ -54,6 +56,10 @@ class ProjectDetailsScreen extends ConsumerWidget {
         runningEntry,
       ...projectEntries,
     ];
+
+    // Track performance for large datasets
+    PerformanceTracker.trackDataProcessing('project entries', displayEntries.length);
+    MemoryMonitor.logMemoryUsage('project_details_screen');
     final bool isArchived = currentProject.isArchived;
 
     return Scaffold(
@@ -119,17 +125,28 @@ class ProjectDetailsScreen extends ConsumerWidget {
               'No entries yet.',
               style: Theme.of(context).textTheme.bodySmall,
             )
-          else
-            Column(
-              children: displayEntries
-                  .map(
-                    (TimeEntry entry) => TimeEntryTile(
-                      entry: entry,
-                      precision: precision,
-                    ),
-                  )
-                  .toList(),
-            ),
+           else
+             SizedBox(
+               height: displayEntries.length * 80.0, // Approximate height for each tile
+               child: NotificationListener<ScrollNotification>(
+                 onNotification: (scrollNotification) {
+                   if (scrollNotification is ScrollUpdateNotification) {
+                     PerformanceTracker.trackScrollPerformance('project entries', scrollNotification.metrics.pixels);
+                   }
+                   return false;
+                 },
+                 child: ListView.builder(
+                   physics: const NeverScrollableScrollPhysics(), // Disable scrolling since parent is scrollable
+                   itemCount: displayEntries.length,
+                   itemBuilder: (context, index) {
+                     return TimeEntryTile(
+                       entry: displayEntries[index],
+                       precision: precision,
+                     );
+                   },
+                 ),
+               ),
+             ),
           const SizedBox(height: 20),
           TextButton.icon(
             onPressed: () => _toggleArchive(

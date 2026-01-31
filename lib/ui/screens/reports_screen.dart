@@ -7,6 +7,7 @@ import '../../state/projects_state.dart';
 import '../../models/report_models.dart';
 import '../../models/time_entry.dart';
 import '../../utils/report_aggregation.dart';
+import '../../utils/performance_monitor.dart';
 import '../widgets/report_table.dart';
 import '../widgets/weekly_report_table.dart';
 
@@ -152,6 +153,9 @@ class ReportsScreen extends ConsumerWidget {
       allEntries.add(timerState.runningEntry!);
     }
 
+    // Track performance for data processing
+    PerformanceTracker.trackDataProcessing('daily report aggregation', allEntries.length);
+
     final days = daysInRange(state.range);
     final List<DailyReportData> dailyReports = [];
 
@@ -169,19 +173,27 @@ class ReportsScreen extends ConsumerWidget {
       return _buildEmptyState(context, 'No time entries for this period');
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: dailyReports.length,
-      itemBuilder: (context, index) {
-        final dailyData = dailyReports[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: ReportTable(
-            title: _formatDayDate(dailyData.date),
-            data: dailyData.report,
-          ),
-        );
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollUpdateNotification) {
+          PerformanceTracker.trackScrollPerformance('daily reports', scrollNotification.metrics.pixels);
+        }
+        return false;
       },
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: dailyReports.length,
+        itemBuilder: (context, index) {
+          final dailyData = dailyReports[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: ReportTable(
+              title: _formatDayDate(dailyData.date),
+              data: dailyData.report,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -194,6 +206,9 @@ class ReportsScreen extends ConsumerWidget {
     if (timerState.runningEntry != null) {
       allEntries.add(timerState.runningEntry!);
     }
+
+    // Track performance for data processing
+    PerformanceTracker.trackDataProcessing('weekly report aggregation', allEntries.length);
 
     // Calculate week starts within the selected range
     final List<DateTime> weekStarts = [];
@@ -226,19 +241,27 @@ class ReportsScreen extends ConsumerWidget {
       return _buildEmptyState(context, 'No time entries for this period');
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: weeklyReports.length,
-      itemBuilder: (context, index) {
-        final weeklyData = weeklyReports[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollUpdateNotification) {
+          PerformanceTracker.trackScrollPerformance('weekly reports', scrollNotification.metrics.pixels);
+        }
+        return false;
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: weeklyReports.length,
+        itemBuilder: (context, index) {
+          final weeklyData = weeklyReports[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
           child: WeeklyReportTable(
             data: weeklyData.report,
             weekStart: weeklyData.weekStart,
           ),
         );
       },
+      ),
     );
   }
 
