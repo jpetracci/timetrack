@@ -248,7 +248,7 @@ void main() {
       test('daysInRange returns inclusive list of days', () {
         final start = DateTime(2026, 1, 20);
         final end = DateTime(2026, 1, 22);
-        final range = DateTimeRange(start: start, end: end);
+        final range = DateRange(start: start, end: end);
 
         final days = daysInRange(range);
 

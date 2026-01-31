@@ -9,7 +9,7 @@ DateTime normalizeDay(DateTime value) {
 }
 
 /// Returns an inclusive list of days in the given range
-List<DateTime> daysInRange(DateTimeRange range) {
+List<DateTime> daysInRange(DateRange range) {
   final List<DateTime> days = [];
   DateTime current = normalizeDay(range.start);
   final end = normalizeDay(range.end);

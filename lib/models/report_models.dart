@@ -102,8 +102,8 @@ class WeeklyProjectBreakdown {
 }
 
 /// Simple date range utility
-class DateTimeRange {
-  const DateTimeRange({
+class DateRange {
+  const DateRange({
     required this.start,
     required this.end,
   });
@@ -114,7 +114,7 @@ class DateTimeRange {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is DateTimeRange &&
+    return other is DateRange &&
         other.start == start &&
         other.end == end;
   }
@@ -124,6 +124,6 @@ class DateTimeRange {
 
   @override
   String toString() {
-    return 'DateTimeRange(start: $start, end: $end)';
+    return 'DateRange(start: $start, end: $end)';
   }
 }
