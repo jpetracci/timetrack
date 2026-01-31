@@ -2,39 +2,49 @@
 
 ## What This Is
 
-A Flutter time-tracking app that runs on mobile (iOS/Android) and web. Users create projects, tap to start a timer, and track how long they spend on each. Time is displayed in decimal hours, reports summarize daily/weekly totals, and all data stays local on the device.
+A Flutter time-tracking app that runs on mobile (iOS/Android) and web. Users create projects, tap to start a timer, and track how long they spend on each. Time is displayed in decimal hours, reports summarize daily/weekly totals, and all data stays local on device.
 
 ## Core Value
 
 One-tap time tracking with instant project switching — start tracking immediately, switch projects without friction, see where time goes.
 
-## Requirements
+## Current State
+
+**Shipped:** v1.0 MVP (2026-01-31)
+- Cross-platform time-tracking with 28 requirements completed
+- iOS, Android, and web deployment ready
+- Local-first data storage with comprehensive reporting
+
+**Next Milestone Goals:**
+- Advanced features (Pomodoro, templates, notes)
+- Performance optimizations and desktop enhancements
+- User experience improvements (dark theme, widgets)
 
 ### Validated
 
-(None yet — ship to validate)
+All v1 requirements have been shipped. See [.planning/milestones/v1-REQUIREMENTS.md](.planning/milestones/v1-REQUIREMENTS.md) for complete record.
 
 ### Active
 
-- [ ] Create and manage projects (name + tags)
-- [ ] One-tap start/stop timer on any project
-- [ ] Switching projects auto-stops the current timer
-- [ ] Active project displayed prominently at top of screen
-- [ ] Time displayed in configurable decimal hours (default 2 decimal places)
-- [ ] View project details and time history
-- [ ] Edit and delete past time entries
-- [ ] Archive and delete projects
-- [ ] Daily and weekly time reports (simple table)
-- [ ] All data stored locally on device
-- [ ] Runs on iOS, Android, and web
+- [ ] Pomodoro timer integration
+- [ ] Project templates with default tags
+- [ ] Time entry notes and descriptions
+- [ ] Visual charts and graphs for time analysis
+- [ ] Goal tracking (daily/weekly time targets)
+- [ ] Calendar integration for blocking time
+- [ ] Dark theme support
+- [ ] Widget support (home screen timer)
+- [ ] Quick project switching shortcuts
+- [ ] Time entry search and filtering
+- [ ] Batch operations (multiple time entry edit)
 
 ### Out of Scope
 
-- Cloud sync / remote storage — local-only by design
-- Team features / shared projects — single-user app
-- Billing / invoicing — this is a time tracker, not a billing tool
-- Notifications / reminders — no background alerts
-- Pause/resume within a single session — stop creates a new entry
+- Cloud sync / multi-device support — Privacy-focused design, local-only by requirement
+- Team features / shared projects — Single-user app, adds complexity
+- Billing / invoicing features — Time tracking focus, not a billing tool
+- Notifications / reminders — v1 focused on core functionality
+- Advanced analytics — Simple reports sufficient for current needs
 
 ## Context
 
@@ -60,4 +70,5 @@ One-tap time tracking with instant project switching — start tracking immediat
 | Local storage only | Privacy, simplicity, no backend maintenance | — Pending |
 
 ---
-*Last updated: 2026-01-30 after initialization*
+
+*Last updated: 2026-01-31 after v1.0 milestone completion*

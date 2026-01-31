@@ -5,67 +5,13 @@
 
 ## v1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+### Validated
 
-### Core Timer Functionality
+All v1 requirements have been completed and moved to the requirements archive.
 
- - [x] **TIMER-01**: User can start timer with single tap on any project
- - [x] **TIMER-02**: User can stop timer with single tap 
- - [x] **TIMER-03**: Starting timer on new project auto-stops current timer
-- [x] **TIMER-04**: Timer continues running accurately when app is in background
-- [x] **TIMER-05**: Timer persists across app restarts without data loss
+### v2 Requirements
 
-### Project Management
-
- - [x] **PROJ-01**: User can create new project with name
- - [x] **PROJ-02**: User can add tags to projects for organization
-- [x] **PROJ-03**: User can edit project name and tags
-- [x] **PROJ-04**: User can delete individual projects
-- [x] **PROJ-05**: User can archive projects (hide from main view)
-- [ ] **PROJ-06**: Active project displayed prominently at top of screen
-
-### Time Display & History
-
-- [ ] **DISP-01**: Time displayed in decimal hours (default 2 decimal places)
-- [ ] **DISP-02**: User can configure decimal precision (1-4 places)
-- [x] **DISP-03**: User can view project details with complete time history
-- [x] **DISP-04**: User can edit past time entries (adjust duration)
-- [x] **DISP-05**: User can delete individual time entries
-- [x] **DISP-06**: Time history shows start/end times and duration
-
-### Reporting
-
- - [x] **REPT-01**: User can view daily time report (simple table format)
- - [x] **REPT-02**: User can view weekly time report (simple table format)
- - [x] **REPT-03**: Reports show project totals and daily breakdowns
- - [x] **REPT-04**: Reports can be filtered by date range
-
-### Data Storage
-
- - [x] **STOR-01**: All data stored locally on device (no network dependency)
- - [x] **STOR-02**: Data persists across app updates
- - [x] **STOR-03**: User can export data as JSON/CSV
- - [x] **STOR-04**: Data migration handled when app schema changes
-
-### Platform Support
-
-- [x] **PLAT-01**: App runs on iOS devices with responsive design
-- [x] **PLAT-02**: App runs on Android devices with responsive design  
-- [x] **PLAT-03**: App runs on web browsers with responsive design
-- [x] **PLAT-04**: Touch interface optimized for mobile devices
-- [x] **PLAT-05**: Pointer interface optimized for web/desktop use
-
-### User Experience
-
-- [ ] **UX-01**: App launches and is ready to use within 2 seconds
-- [ ] **UX-02**: Timer controls remain accessible during scrolling/navigation
-- [ ] **UX-03**: Visual feedback for all user interactions
-- [ ] **UX-04**: Clear visual distinction between active and inactive projects
-- [ ] **UX-05**: Intuitive navigation between project list, reports, and settings
-
-## v2 Requirements
-
-Deferred to future release. Tracked but not in current roadmap.
+These requirements will be developed in the next milestone. Planning phase will determine final scope.
 
 ### Advanced Features
 
@@ -80,6 +26,21 @@ Deferred to future release. Tracked but not in current roadmap.
 - **INTG-01**: Calendar integration for blocking time
 - **INTG-02**: Basic API for third-party integrations
 
+### User Experience Enhancements
+
+- **UX-06**: Dark theme support
+- **UX-07**: Widget support (home screen timer)
+- **UX-08**: Quick project switching shortcuts
+- **UX-09**: Time entry search and filtering
+- **UX-10**: Batch operations (multiple time entry edit)
+
+### Performance & Platform
+
+- **PERF-01**: Offline mode indicator
+- **PERF-02**: Data usage statistics
+- **PERF-03**: Background sync preparation
+- **PERF-04**: Desktop-specific optimizations
+
 ## Out of Scope
 
 Explicitly excluded. Documented to prevent scope creep.
@@ -88,60 +49,38 @@ Explicitly excluded. Documented to prevent scope creep.
 |---------|--------|
 | Cloud sync / multi-device support | Privacy-focused design, local-only by requirement |
 | Team features / shared projects | Single-user app, adds complexity |
-| Billing / invoicing features | Time tracking focus, not accounting |
+| Billing / invoicing features | Time tracking focus, not a billing tool |
 | Real-time collaboration | Single-user app, no network dependency |
-| Push notifications | User preference, no background alerts needed |
-| Complex analytics | Simple reports sufficient for v1 |
-| Subscription/Premium features | One-time purchase model preferred |
-| Data import from other time trackers | Export prioritized over import for simplicity |
+| Advanced analytics | Simple reports sufficient for v1 |
 
-## Traceability
+## Context
 
-Which phases cover which requirements. Updated during roadmap creation.
+### Current State
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| TIMER-01 | Phase 1 | Complete |
-| TIMER-02 | Phase 1 | Complete |
-| TIMER-03 | Phase 1 | Complete |
-| PROJ-01 | Phase 1 | Complete |
-| PROJ-02 | Phase 1 | Complete |
-| STOR-01 | Phase 1 | Complete |
-| PLAT-01 | Phase 2 | Complete |
-| PLAT-02 | Phase 2 | Complete |
-| PLAT-03 | Phase 2 | Complete |
-| TIMER-04 | Phase 2 | Complete |
-| TIMER-05 | Phase 2 | Complete |
-| PROJ-06 | Phase 3 | Pending |
-| DISP-01 | Phase 3 | Pending |
-| DISP-02 | Phase 3 | Pending |
-| UX-01 | Phase 3 | Pending |
-| UX-02 | Phase 3 | Pending |
-| UX-03 | Phase 3 | Pending |
-| UX-04 | Phase 3 | Pending |
-| UX-05 | Phase 3 | Pending |
-| PROJ-03 | Phase 4 | Complete |
-| PROJ-04 | Phase 4 | Complete |
-| PROJ-05 | Phase 4 | Complete |
-| DISP-03 | Phase 4 | Complete |
-| DISP-04 | Phase 4 | Complete |
-| DISP-05 | Phase 4 | Complete |
-| DISP-06 | Phase 4 | Complete |
-| REPT-01 | Phase 5 | Complete |
-| REPT-02 | Phase 5 | Complete |
-| REPT-03 | Phase 5 | Complete |
-| REPT-04 | Phase 5 | Complete |
-| STOR-02 | Phase 5 | Complete |
-| STOR-03 | Phase 5 | Complete |
-| STOR-04 | Phase 5 | Complete |
-| PLAT-04 | Phase 6 | Complete |
-| PLAT-05 | Phase 6 | Complete |
+**Shipped:** v1.0 MVP with 28 requirements completed
+**Tech Stack:** Flutter + Riverpod + SharedPreferences
+**Platforms:** iOS, Android, Web
+**Codebase:** ~3,000 LOC Dart, 50+ files
+**Architecture:** Clean architecture with clear separation of concerns
 
-**Coverage:**
-- v1 requirements: 28 total
-- Mapped to phases: 28
-- Unmapped: 0 ✓
+### Constraints
+
+- **Platform**: Flutter/Dart — maintain cross-platform approach
+- **Storage**: Local first — continue privacy-focused design
+- **UI**: Responsive design with platform-adaptive interactions
+- **Performance**: Maintain <2s launch, handle 1000+ entries
+
+## Key Decisions
+
+| Decision | Rationale | Outcome |
+|----------|-----------|---------|
+| Flutter + Riverpod | Proven stack, maintainability | — v1.0 shipped |
+| Local-first storage | Privacy by design, no backend complexity | — v1.0 shipped |
+| Decimal hours display | User preference for consistent format | — v1.0 shipped |
+| Platform-adaptive UI | Different interactions per device | — v1.0 shipped |
+| Semantic accessibility | Screen reader support mandatory | — v1.0 shipped |
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-31 after Phase 2 verification*
+*Fresh requirements for next milestone: 2026-01-31*
+*All v1 requirements completed and archived*
