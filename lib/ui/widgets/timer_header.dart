@@ -77,111 +77,139 @@ class TimerHeader extends ConsumerWidget {
         elevation: 0,
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final bool isCompact = constraints.maxHeight < 120;
+            final EdgeInsets contentPadding = EdgeInsets.all(
+              isCompact ? 12 : 16,
+            );
+            final TextStyle? nameStyle = isCompact
+                ? Theme.of(context).textTheme.titleMedium
+                : Theme.of(context).textTheme.titleLarge;
+            final TextStyle? timeStyle = isCompact
+                ? Theme.of(context).textTheme.headlineSmall
+                : Theme.of(context).textTheme.displaySmall;
+            final ButtonStyle? buttonStyle = isCompact
+                ? FilledButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  )
+                : null;
+
+            return Padding(
+              padding: contentPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      displayName,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: nameStyle,
+                        ),
+                      ),
+                      AnimatedSwitcher(
+                        duration: animationDuration,
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: Tween<double>(begin: 0.96, end: 1)
+                                  .animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: timerSnapshot.isRunning
+                            ? FilledButton.icon(
+                                key: const ValueKey<String>('stop'),
+                                style: buttonStyle,
+                                onPressed: () async {
+                                  try {
+                                    await ref
+                                        .read(timerControllerProvider.notifier)
+                                        .stop();
+                                  } catch (_) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text('Could not stop timer.'),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.stop),
+                                label: const Text('Stop'),
+                              )
+                            : FilledButton.icon(
+                                key: const ValueKey<String>('start'),
+                                style: buttonStyle,
+                                onPressed: canStart
+                                    ? () async {
+                                        try {
+                                          await ref
+                                              .read(
+                                                timerControllerProvider.notifier,
+                                              )
+                                              .start(selectedProjectId);
+                                        } catch (_) {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Could not start timer.',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      }
+                                    : null,
+                                icon: const Icon(Icons.play_arrow),
+                                label: const Text('Start'),
+                              ),
+                      ),
+                    ],
                   ),
+                  SizedBox(height: isCompact ? 6 : 12),
                   AnimatedSwitcher(
                     duration: animationDuration,
                     switchInCurve: Curves.easeOut,
                     switchOutCurve: Curves.easeIn,
                     transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: ScaleTransition(
-                          scale: Tween<double>(begin: 0.96, end: 1)
-                              .animate(animation),
-                          child: child,
-                        ),
-                      );
+                      return FadeTransition(opacity: animation, child: child);
                     },
-                    child: timerSnapshot.isRunning
-                        ? FilledButton.icon(
-                            key: const ValueKey<String>('stop'),
-                            onPressed: () async {
-                              try {
-                                await ref
-                                    .read(timerControllerProvider.notifier)
-                                    .stop();
-                              } catch (_) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Could not stop timer.'),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            icon: const Icon(Icons.stop),
-                            label: const Text('Stop'),
-                          )
-                        : FilledButton.icon(
-                            key: const ValueKey<String>('start'),
-                            onPressed: canStart
-                                ? () async {
-                                    try {
-                                      await ref
-                                          .read(timerControllerProvider.notifier)
-                                          .start(selectedProjectId);
-                                    } catch (_) {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Could not start timer.',
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  }
-                                : null,
-                            icon: const Icon(Icons.play_arrow),
-                            label: const Text('Start'),
+                    child: Text(
+                      timerSnapshot.isRunning ? 'Running' : 'Stopped',
+                      key: ValueKey<bool>(timerSnapshot.isRunning),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: timerSnapshot.isRunning
+                                ? colors.primary
+                                : colors.onSurfaceVariant,
                           ),
+                    ),
+                  ),
+                  SizedBox(height: isCompact ? 2 : 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      displayTime,
+                      style: timeStyle?.copyWith(color: timeColor),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              AnimatedSwitcher(
-                duration: animationDuration,
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: Text(
-                  timerSnapshot.isRunning ? 'Running' : 'Stopped',
-                  key: ValueKey<bool>(timerSnapshot.isRunning),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: timerSnapshot.isRunning
-                            ? colors.primary
-                            : colors.onSurfaceVariant,
-                      ),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                displayTime,
-                style: Theme.of(context)
-                    .textTheme
-                    .displaySmall
-                    ?.copyWith(color: timeColor),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
