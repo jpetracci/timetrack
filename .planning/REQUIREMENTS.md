@@ -52,8 +52,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PLAT-01**: App runs on iOS devices with responsive design
 - [x] **PLAT-02**: App runs on Android devices with responsive design  
 - [x] **PLAT-03**: App runs on web browsers with responsive design
-- [ ] **PLAT-04**: Touch interface optimized for mobile devices
-- [ ] **PLAT-05**: Pointer interface optimized for web/desktop use
+- [x] **PLAT-04**: Touch interface optimized for mobile devices
+- [x] **PLAT-05**: Pointer interface optimized for web/desktop use
 
 ### User Experience
 
@@ -134,8 +134,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-02 | Phase 5 | Complete |
 | STOR-03 | Phase 5 | Complete |
 | STOR-04 | Phase 5 | Complete |
-| PLAT-04 | Phase 6 | Pending |
-| PLAT-05 | Phase 6 | Pending |
+| PLAT-04 | Phase 6 | Complete |
+| PLAT-05 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 28 total
