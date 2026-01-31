@@ -86,7 +86,7 @@ Plans:
 - [x] 04-03-PLAN.md — Time history UI with inline edit/delete
 
 ### Phase 5: Reporting
-**Goal: Daily/weekly reports with data export and persistence
+**Goal**: Daily/weekly reports with data export and persistence
 **Depends on:** Phase 4
 **Requirements**: REPT-01, REPT-02, REPT-03, REPT-04, STOR-02, STOR-03, STOR-04
 **Success Criteria** (what must be TRUE):
@@ -97,9 +97,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01: Create daily and weekly report views with table layouts
-- [ ] 05-02: Implement date range filtering for reports
-- [ ] 05-03: Build data export system and schema migration framework
+- [ ] 05-01-PLAN.md — Report aggregation helpers with tests
+- [ ] 05-02-PLAN.md — Reports screen with daily/weekly tables and date range filtering
+- [ ] 05-03-PLAN.md — Data export (JSON/CSV) and schema migration framework
 
 ### Phase 6: Platform Polish
 **Goal**: Optimize touch/pointer interfaces and app performance
