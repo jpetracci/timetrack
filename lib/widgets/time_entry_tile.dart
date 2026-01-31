@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/time_entry.dart';
 import '../state/timer_controller.dart';
 import '../utils/decimal_time.dart';
+import '../utils/platform_detector.dart';
+import '../widgets/touch_optimized_button.dart';
+import '../widgets/hover_wrapper.dart';
 
 class TimeEntryTile extends ConsumerWidget {
   const TimeEntryTile({
@@ -95,22 +98,51 @@ class TimeEntryTile extends ConsumerWidget {
           Row(
             children: <Widget>[
               const Spacer(),
-              IconButton(
-                onPressed: entry.isRunning
-                    ? null
-                    : () => _showEditSheet(context, ref),
-                icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Edit duration',
-                visualDensity: VisualDensity.compact,
-              ),
-              IconButton(
-                onPressed: entry.isRunning
-                    ? null
-                    : () => _confirmDelete(context, ref),
-                icon: const Icon(Icons.delete_outline),
-                tooltip: 'Delete entry',
-                visualDensity: VisualDensity.compact,
-              ),
+              // Platform-adaptive edit button
+              PlatformDetector.isTouchDevice
+                  ? TouchOptimizedIconButton(
+                      onPressed: entry.isRunning
+                          ? null
+                          : () => _showEditSheet(context, ref),
+                      icon: const Icon(Icons.edit_outlined),
+                      tooltip: 'Edit duration',
+                      size: 24,
+                    )
+                  : HoverWrapper(
+                      cursor: SystemMouseCursors.click,
+                      hoverScale: 1.15,
+                      child: IconButton(
+                        onPressed: entry.isRunning
+                            ? null
+                            : () => _showEditSheet(context, ref),
+                        icon: const Icon(Icons.edit_outlined),
+                        tooltip: 'Edit duration',
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+              const SizedBox(width: 8),
+              // Platform-adaptive delete button
+              PlatformDetector.isTouchDevice
+                  ? TouchOptimizedIconButton(
+                      onPressed: entry.isRunning
+                          ? null
+                          : () => _confirmDelete(context, ref),
+                      icon: const Icon(Icons.delete_outline),
+                      tooltip: 'Delete entry',
+                      size: 24,
+                    )
+                  : HoverWrapper(
+                      cursor: SystemMouseCursors.click,
+                      hoverScale: 1.15,
+                      child: IconButton(
+                        onPressed: entry.isRunning
+                            ? null
+                            : () => _confirmDelete(context, ref),
+                        icon: const Icon(Icons.delete_outline),
+                        tooltip: 'Delete entry',
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
             ],
           ),
         ],

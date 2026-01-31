@@ -5,6 +5,8 @@ import '../../state/projects_state.dart';
 import '../../state/settings_controller.dart';
 import '../../state/timer_controller.dart';
 import '../../utils/decimal_time.dart';
+import '../../utils/platform_detector.dart';
+import '../../widgets/hover_wrapper.dart';
 
 class TimerHeader extends ConsumerWidget {
   const TimerHeader({super.key});
@@ -126,56 +128,114 @@ class TimerHeader extends ConsumerWidget {
                           );
                         },
                         child: timerSnapshot.isRunning
-                            ? FilledButton.icon(
-                                key: const ValueKey<String>('stop'),
-                                style: buttonStyle,
-                                onPressed: () async {
-                                  try {
-                                    await ref
-                                        .read(timerControllerProvider.notifier)
-                                        .stop();
-                                  } catch (_) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Could not stop timer.'),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                },
-                                icon: const Icon(Icons.stop),
-                                label: const Text('Stop'),
-                              )
-                            : FilledButton.icon(
-                                key: const ValueKey<String>('start'),
-                                style: buttonStyle,
-                                onPressed: canStart
-                                    ? () async {
-                                        try {
-                                          await ref
-                                              .read(
-                                                timerControllerProvider.notifier,
-                                              )
-                                              .start(selectedProjectId);
-                                        } catch (_) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'Could not start timer.',
-                                                ),
-                                              ),
-                                            );
-                                          }
+                            ? (PlatformDetector.isTouchDevice
+                                ? FilledButton.icon(
+                                    key: const ValueKey<String>('stop'),
+                                    style: buttonStyle,
+                                    onPressed: () async {
+                                      try {
+                                        await ref
+                                            .read(timerControllerProvider.notifier)
+                                            .stop();
+                                      } catch (_) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content:
+                                                  Text('Could not stop timer.'),
+                                            ),
+                                          );
                                         }
                                       }
-                                    : null,
-                                icon: const Icon(Icons.play_arrow),
-                                label: const Text('Start'),
-                              ),
+                                    },
+                                    icon: const Icon(Icons.stop),
+                                    label: const Text('Stop'),
+                                  )
+                                : HoverButton(
+                                    onPressed: () async {
+                                      try {
+                                        await ref
+                                            .read(timerControllerProvider.notifier)
+                                            .stop();
+                                      } catch (_) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content:
+                                                  Text('Could not stop timer.'),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    child: FilledButton.icon(
+                                      key: const ValueKey<String>('stop'),
+                                      style: buttonStyle,
+                                      onPressed: null, // Handled by HoverButton
+                                      icon: const Icon(Icons.stop),
+                                      label: const Text('Stop'),
+                                    ),
+                                  ))
+                            : (PlatformDetector.isTouchDevice
+                                ? FilledButton.icon(
+                                    key: const ValueKey<String>('start'),
+                                    style: buttonStyle,
+                                    onPressed: canStart
+                                        ? () async {
+                                            try {
+                                              await ref
+                                                  .read(
+                                                    timerControllerProvider.notifier,
+                                                  )
+                                                  .start(selectedProjectId);
+                                            } catch (_) {
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Could not start timer.',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          }
+                                        : null,
+                                    icon: const Icon(Icons.play_arrow),
+                                    label: const Text('Start'),
+                                  )
+                                : HoverButton(
+                                    onPressed: canStart
+                                        ? () async {
+                                            try {
+                                              await ref
+                                                  .read(
+                                                    timerControllerProvider.notifier,
+                                                  )
+                                                  .start(selectedProjectId);
+                                            } catch (_) {
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Could not start timer.',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          }
+                                        : null,
+                                    child: FilledButton.icon(
+                                      key: const ValueKey<String>('start'),
+                                      style: buttonStyle,
+                                      onPressed: null, // Handled by HoverButton
+                                      icon: const Icon(Icons.play_arrow),
+                                      label: const Text('Start'),
+                                    ),
+                                  )),
                       ),
                     ],
                   ),
