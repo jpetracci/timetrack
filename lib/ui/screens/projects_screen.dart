@@ -5,6 +5,7 @@ import '../../models/project.dart';
 import '../../state/projects_state.dart';
 import '../../state/timer_controller.dart';
 import '../../widgets/project_card.dart';
+import 'archived_projects_screen.dart';
 import 'project_details_screen.dart';
 import '../widgets/timer_header.dart';
 
@@ -16,6 +17,11 @@ class ProjectsScreen extends ConsumerWidget {
     final List<Project> projects = ref.watch(
       projectsControllerProvider.select((state) => state.projects),
     );
+    final List<Project> activeProjects = projects
+        .where((Project project) => !project.isArchived)
+        .toList();
+    final bool hasArchived =
+        projects.any((Project project) => project.isArchived);
 
     return SafeArea(
       bottom: false,
@@ -45,17 +51,37 @@ class ProjectsScreen extends ConsumerWidget {
                         horizontalPadding,
                         8,
                       ),
-                      child: Text(
-                        'Projects',
-                        style: Theme.of(context).textTheme.titleMedium,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Projects',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const ArchivedProjectsScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.archive_outlined),
+                            label: const Text('Archived'),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  if (projects.isEmpty)
-                    const SliverFillRemaining(
+                  if (activeProjects.isEmpty)
+                    SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
-                        child: Text('No projects yet. Add your first one.'),
+                        child: Text(
+                          hasArchived
+                              ? 'No active projects. Check Archived.'
+                              : 'No projects yet. Add your first one.',
+                        ),
                       ),
                     )
                   else
@@ -63,14 +89,14 @@ class ProjectsScreen extends ConsumerWidget {
                       padding: EdgeInsets.symmetric(
                         horizontal: horizontalPadding,
                       ),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            final Project project = projects[index];
-                            return Consumer(
-                              builder: (
-                                BuildContext context,
-                                WidgetRef ref,
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              final Project project = activeProjects[index];
+                              return Consumer(
+                                builder: (
+                                  BuildContext context,
+                                  WidgetRef ref,
                                 Widget? child,
                               ) {
                                 final bool isActive = ref.watch(
@@ -147,11 +173,11 @@ class ProjectsScreen extends ConsumerWidget {
                                 );
                               },
                             );
-                          },
-                          childCount: projects.length,
+                            },
+                            childCount: activeProjects.length,
+                          ),
                         ),
                       ),
-                    ),
                   const SliverToBoxAdapter(
                     child: SizedBox(height: 24),
                   ),

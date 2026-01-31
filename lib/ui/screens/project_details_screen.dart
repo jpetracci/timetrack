@@ -30,6 +30,13 @@ class ProjectDetailsScreen extends ConsumerWidget {
     }
 
     final ColorScheme colors = Theme.of(context).colorScheme;
+    final bool isRunningForProject = ref.watch(
+      timerControllerProvider.select(
+        (state) =>
+            state.isRunning && state.activeProjectId == project!.id,
+      ),
+    );
+    final bool isArchived = project.isArchived;
 
     return Scaffold(
       appBar: AppBar(
@@ -85,6 +92,19 @@ class ProjectDetailsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 32),
           TextButton.icon(
+            onPressed: () => _toggleArchive(
+              context,
+              ref,
+              project!,
+              isRunningForProject,
+            ),
+            icon: Icon(
+              isArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
+            ),
+            label: Text(isArchived ? 'Restore project' : 'Archive project'),
+          ),
+          const SizedBox(height: 12),
+          TextButton.icon(
             onPressed: () => _confirmDelete(context, ref, project!),
             icon: const Icon(Icons.delete_outline),
             label: const Text('Delete project'),
@@ -101,6 +121,60 @@ class ProjectDetailsScreen extends ConsumerWidget {
       isScrollControlled: true,
       builder: (BuildContext context) => ProjectEditSheet(project: project),
     );
+  }
+
+  Future<void> _toggleArchive(
+    BuildContext context,
+    WidgetRef ref,
+    Project project,
+    bool isRunningForProject,
+  ) async {
+    if (!project.isArchived && isRunningForProject) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Stop the timer before archiving this project.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final controller = ref.read(projectsControllerProvider.notifier);
+      if (project.isArchived) {
+        await controller.unarchiveProject(project.id);
+      } else {
+        await controller.archiveProject(project.id);
+      }
+    } catch (_) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            project.isArchived
+                ? 'Could not restore project.'
+                : 'Could not archive project.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!context.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          project.isArchived ? 'Project restored.' : 'Project archived.',
+        ),
+      ),
+    );
+
+    if (!project.isArchived) {
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> _confirmDelete(
