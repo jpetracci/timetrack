@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/project.dart';
+import '../../models/time_entry.dart';
 import '../../state/projects_state.dart';
+import '../../state/settings_controller.dart';
 import '../../state/timer_controller.dart';
 import '../../widgets/project_edit_sheet.dart';
+import '../../widgets/time_entry_tile.dart';
 
 class ProjectDetailsScreen extends ConsumerWidget {
   const ProjectDetailsScreen({super.key, required this.projectId});
@@ -29,21 +32,36 @@ class ProjectDetailsScreen extends ConsumerWidget {
       );
     }
 
+    final Project currentProject = project;
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final bool isRunningForProject = ref.watch(
-      timerControllerProvider.select(
-        (state) =>
-            state.isRunning && state.activeProjectId == project!.id,
-      ),
+    final timerState = ref.watch(timerControllerProvider);
+    final int precision = ref.watch(
+      settingsControllerProvider.select((state) => state.precision),
     );
-    final bool isArchived = project.isArchived;
+    final bool isRunningForProject = timerState.isRunning &&
+        timerState.activeProjectId == currentProject.id;
+    final List<TimeEntry> projectEntries = timerState.entries
+        .where((TimeEntry entry) => entry.projectId == currentProject.id)
+        .toList()
+      ..sort(
+        (TimeEntry a, TimeEntry b) =>
+            _entrySortKey(b).compareTo(_entrySortKey(a)),
+      );
+    final TimeEntry? runningEntry = timerState.runningEntry;
+    final List<TimeEntry> displayEntries = <TimeEntry>[
+      if (runningEntry != null &&
+          runningEntry.projectId == currentProject.id)
+        runningEntry,
+      ...projectEntries,
+    ];
+    final bool isArchived = currentProject.isArchived;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Project Details'),
         actions: <Widget>[
           IconButton(
-            onPressed: () => _showEditSheet(context, project!),
+            onPressed: () => _showEditSheet(context, currentProject),
             icon: const Icon(Icons.edit),
             tooltip: 'Edit',
           ),
@@ -53,7 +71,7 @@ class ProjectDetailsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: <Widget>[
           Text(
-            project.name,
+            currentProject.name,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
@@ -62,24 +80,24 @@ class ProjectDetailsScreen extends ConsumerWidget {
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
-          if (project.tags.isEmpty)
-            Text(
-              'No tags',
-              style: Theme.of(context).textTheme.bodySmall,
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: project.tags
-                  .map(
-                    (String tag) => Chip(
-                      label: Text(tag),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  )
-                  .toList(),
-            ),
+           if (currentProject.tags.isEmpty)
+             Text(
+               'No tags',
+               style: Theme.of(context).textTheme.bodySmall,
+             )
+           else
+             Wrap(
+               spacing: 8,
+               runSpacing: 8,
+               children: currentProject.tags
+                   .map(
+                     (String tag) => Chip(
+                       label: Text(tag),
+                       visualDensity: VisualDensity.compact,
+                     ),
+                   )
+                   .toList(),
+             ),
           const SizedBox(height: 20),
           Text(
             'Created',
@@ -87,15 +105,37 @@ class ProjectDetailsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            _formatDate(project.createdAt),
+            _formatDate(currentProject.createdAt),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 32),
+          Text(
+            'Time history',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+          if (displayEntries.isEmpty)
+            Text(
+              'No entries yet.',
+              style: Theme.of(context).textTheme.bodySmall,
+            )
+          else
+            Column(
+              children: displayEntries
+                  .map(
+                    (TimeEntry entry) => TimeEntryTile(
+                      entry: entry,
+                      precision: precision,
+                    ),
+                  )
+                  .toList(),
+            ),
+          const SizedBox(height: 20),
           TextButton.icon(
             onPressed: () => _toggleArchive(
               context,
               ref,
-              project!,
+              currentProject,
               isRunningForProject,
             ),
             icon: Icon(
@@ -105,7 +145,7 @@ class ProjectDetailsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           TextButton.icon(
-            onPressed: () => _confirmDelete(context, ref, project!),
+            onPressed: () => _confirmDelete(context, ref, currentProject),
             icon: const Icon(Icons.delete_outline),
             label: const Text('Delete project'),
             style: TextButton.styleFrom(foregroundColor: colors.error),
@@ -243,5 +283,9 @@ class ProjectDetailsScreen extends ConsumerWidget {
     final String month = local.month.toString().padLeft(2, '0');
     final String day = local.day.toString().padLeft(2, '0');
     return '${local.year}-$month-$day';
+  }
+
+  DateTime _entrySortKey(TimeEntry entry) {
+    return entry.end ?? entry.start;
   }
 }
