@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'state/projects_state.dart';
+import 'state/settings_controller.dart';
 import 'state/timer_controller.dart';
 import 'ui/home_screen.dart';
 
@@ -31,6 +32,7 @@ class _TimeTrackAppState extends ConsumerState<TimeTrackApp>
       Future(() async {
         await ref.read(projectsControllerProvider.notifier).loadProjects();
         await ref.read(timerControllerProvider.notifier).hydrate();
+        await ref.read(settingsControllerProvider.notifier).hydrate();
       });
     });
   }
