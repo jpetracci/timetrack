@@ -103,6 +103,14 @@ class TimerController extends Notifier<TimerState> {
     _projectsController.setActiveProject(null);
   }
 
+  Future<void> removeEntriesForProject(String projectId) async {
+    final List<TimeEntry> updatedEntries = state.entries
+        .where((TimeEntry entry) => entry.projectId != projectId)
+        .toList();
+    state = state.copyWith(entries: updatedEntries);
+    await _storage.saveEntries(updatedEntries);
+  }
+
   Future<void> switchTo(String projectId) async {
     if (!state.isRunning) {
       await start(projectId);

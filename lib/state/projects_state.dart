@@ -87,6 +87,20 @@ class ProjectsController extends Notifier<ProjectsState> {
     await _storage.saveProjects(updated);
   }
 
+  Future<void> deleteProject(String projectId) async {
+    final List<Project> updated = state.projects
+        .where((Project project) => project.id != projectId)
+        .toList();
+    final String? activeProjectId =
+        state.activeProjectId == projectId ? null : state.activeProjectId;
+
+    state = state.copyWith(
+      projects: updated,
+      activeProjectId: activeProjectId,
+    );
+    await _storage.saveProjects(updated);
+  }
+
   void setActiveProject(String? projectId) {
     state = state.copyWith(activeProjectId: projectId);
   }
