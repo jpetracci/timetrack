@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/projects_state.dart';
+import '../../state/settings_controller.dart';
 import '../../state/timer_controller.dart';
 import '../../utils/decimal_time.dart';
 
@@ -45,12 +46,16 @@ class TimerHeader extends ConsumerWidget {
         return null;
       }),
     );
+    final int precision = ref.watch(
+      settingsControllerProvider.select((state) => state.precision),
+    );
 
     final String displayName = projectName ??
         (lookupProjectId == null ? 'No recent project' : 'Unknown project');
     final Duration displayDuration =
         timerSnapshot.isRunning ? timerSnapshot.elapsed : Duration.zero;
-    final String displayTime = '${formatDecimalHours(displayDuration, 2)}h';
+    final String displayTime =
+        formatDecimalHours(displayDuration, precision);
     final bool canStart =
         !timerSnapshot.isRunning && lookupProjectId != null;
 

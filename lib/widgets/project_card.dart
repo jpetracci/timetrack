@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/project.dart';
+import '../state/settings_controller.dart';
 import '../utils/decimal_time.dart';
 
-class ProjectCard extends StatelessWidget {
+class ProjectCard extends ConsumerWidget {
   const ProjectCard({
     super.key,
     required this.project,
@@ -20,7 +22,10 @@ class ProjectCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final int precision = ref.watch(
+      settingsControllerProvider.select((state) => state.precision),
+    );
     final Color? background = isActive
         ? Theme.of(context).colorScheme.primaryContainer
         : null;
@@ -71,7 +76,7 @@ class ProjectCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    '${formatDecimalHours(elapsed, 2)}h',
+                    formatDecimalHours(elapsed, precision),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),
