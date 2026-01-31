@@ -2,25 +2,7 @@
 
 One-tap time tracking with instant project switching. TimeTrack is a Flutter app for iOS, Android, and web that stores all data locally on device. Time is displayed in decimal hours (for example, 2.75h).
 
-## Features (Phase 1)
-
-- Create projects with name and tags
-- One-tap start/stop timer per project
-- Switching projects auto-stops the current timer
-- Active project shown at the top of the screen
-- Decimal hour display
-- Local-only storage (SharedPreferences)
-
-## Tech Stack
-
-- Flutter / Dart
-- Riverpod state management
-- SharedPreferences for local persistence
-
-## Requirements
-
-- Flutter SDK installed (`flutter doctor` should pass)
-- iOS Simulator or Android Emulator for mobile, or Chrome for web
+Developed while learning [Claude Code](https://code.claude.com/docs/en/overview)/[Opencode](https://opencode.ai/) and [GSD](https://github.com/glittercowboy/get-shit-done)
 
 ## Running the App
 
