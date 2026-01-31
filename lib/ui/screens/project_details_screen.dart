@@ -7,6 +7,7 @@ import '../../state/projects_state.dart';
 import '../../state/settings_controller.dart';
 import '../../state/timer_controller.dart';
 import '../../utils/performance_monitor.dart';
+import '../../utils/accessibility_helpers.dart';
 import '../../widgets/project_edit_sheet.dart';
 import '../../widgets/time_entry_tile.dart';
 
@@ -63,29 +64,46 @@ class ProjectDetailsScreen extends ConsumerWidget {
     final bool isArchived = currentProject.isArchived;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Project Details'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () => _showEditSheet(context, currentProject),
-            icon: const Icon(Icons.edit),
-            tooltip: 'Edit',
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: <Widget>[
-          Text(
-            currentProject.name,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Tags',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
+       appBar: AppBar(
+         title: const Text('Project Details'),
+         actions: <Widget>[
+           Semantics(
+             button: true,
+             label: 'Edit project',
+             hint: 'Modify project name and tags',
+             child: IconButton(
+               onPressed: () => _showEditSheet(context, currentProject),
+               icon: const Icon(Icons.edit),
+               tooltip: 'Edit',
+             ),
+           ),
+          ],
+        ),
+       body: Semantics(
+         label: AccessibilityHelpers.projectInfoLabel(
+           currentProject.name,
+           currentProject.tags,
+           currentProject.isArchived,
+         ),
+         child: ListView(
+           padding: const EdgeInsets.all(16),
+           children: <Widget>[
+             Semantics(
+               header: true,
+               child: Text(
+                 currentProject.name,
+                 style: Theme.of(context).textTheme.headlineSmall,
+               ),
+             ),
+             const SizedBox(height: 16),
+             Semantics(
+               header: true,
+               child: Text(
+                 'Tags',
+                 style: Theme.of(context).textTheme.titleSmall,
+               ),
+             ),
+             const SizedBox(height: 8),
            if (currentProject.tags.isEmpty)
              Text(
                'No tags',
@@ -104,22 +122,28 @@ class ProjectDetailsScreen extends ConsumerWidget {
                    )
                    .toList(),
              ),
-          const SizedBox(height: 20),
-          Text(
-            'Created',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            _formatDate(currentProject.createdAt),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 32),
-          Text(
-            'Time history',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
+           const SizedBox(height: 20),
+           Semantics(
+             header: true,
+             child: Text(
+               'Created',
+               style: Theme.of(context).textTheme.titleSmall,
+             ),
+           ),
+           const SizedBox(height: 6),
+           Text(
+             _formatDate(currentProject.createdAt),
+             style: Theme.of(context).textTheme.bodyMedium,
+           ),
+           const SizedBox(height: 32),
+           Semantics(
+             header: true,
+             child: Text(
+               'Time history',
+               style: Theme.of(context).textTheme.titleSmall,
+             ),
+           ),
+           const SizedBox(height: 8),
           if (displayEntries.isEmpty)
             Text(
               'No entries yet.',
@@ -148,28 +172,41 @@ class ProjectDetailsScreen extends ConsumerWidget {
                ),
              ),
           const SizedBox(height: 20),
-          TextButton.icon(
-            onPressed: () => _toggleArchive(
-              context,
-              ref,
-              currentProject,
-              isRunningForProject,
-            ),
-            icon: Icon(
-              isArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
-            ),
-            label: Text(isArchived ? 'Restore project' : 'Archive project'),
-          ),
-          const SizedBox(height: 12),
-          TextButton.icon(
-            onPressed: () => _confirmDelete(context, ref, currentProject),
-            icon: const Icon(Icons.delete_outline),
-            label: const Text('Delete project'),
-            style: TextButton.styleFrom(foregroundColor: colors.error),
-          ),
-        ],
-      ),
-    );
+           Semantics(
+             button: true,
+             label: isArchived ? 'Restore project' : 'Archive project',
+             hint: isArchived 
+                 ? 'Restore this project to active status'
+                 : 'Archive this project to hide it from active projects',
+             child: TextButton.icon(
+               onPressed: () => _toggleArchive(
+                 context,
+                 ref,
+                 currentProject,
+                 isRunningForProject,
+               ),
+               icon: Icon(
+                 isArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
+               ),
+               label: Text(isArchived ? 'Restore project' : 'Archive project'),
+             ),
+           ),
+           const SizedBox(height: 12),
+           Semantics(
+             button: true,
+             label: 'Delete project',
+             hint: 'Permanently delete this project and all its time entries',
+             child: TextButton.icon(
+               onPressed: () => _confirmDelete(context, ref, currentProject),
+               icon: const Icon(Icons.delete_outline),
+               label: const Text('Delete project'),
+               style: TextButton.styleFrom(foregroundColor: colors.error),
+             ),
+           ),
+         ],
+       ),
+       ),
+     );
   }
 
   void _showEditSheet(BuildContext context, Project project) {

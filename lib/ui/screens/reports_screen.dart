@@ -8,6 +8,7 @@ import '../../models/report_models.dart';
 import '../../models/time_entry.dart';
 import '../../utils/report_aggregation.dart';
 import '../../utils/performance_monitor.dart';
+import '../../utils/accessibility_helpers.dart';
 import '../widgets/report_table.dart';
 import '../widgets/weekly_report_table.dart';
 
@@ -78,55 +79,74 @@ class ReportsScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // View toggle
-        SegmentedButton<ReportView>(
-          segments: const [
-            ButtonSegment<ReportView>(
-              value: ReportView.daily,
-              label: Text('Daily'),
-              icon: Icon(Icons.calendar_today),
-            ),
-            ButtonSegment<ReportView>(
-              value: ReportView.weekly,
-              label: Text('Weekly'),
-              icon: Icon(Icons.date_range),
-            ),
-          ],
-          selected: <ReportView>{state.view},
-          onSelectionChanged: (Set<ReportView> selection) {
-            if (selection.isNotEmpty) {
-              controller.setView(selection.first);
-            }
-          },
+        // View toggle with semantic labels
+        Semantics(
+          label: 'Report view type',
+          hint: 'Select between daily and weekly report views',
+          child: SegmentedButton<ReportView>(
+            segments: const [
+              ButtonSegment<ReportView>(
+                value: ReportView.daily,
+                label: Text('Daily'),
+                icon: Icon(Icons.calendar_today),
+              ),
+              ButtonSegment<ReportView>(
+                value: ReportView.weekly,
+                label: Text('Weekly'),
+                icon: Icon(Icons.date_range),
+              ),
+            ],
+            selected: <ReportView>{state.view},
+            onSelectionChanged: (Set<ReportView> selection) {
+              if (selection.isNotEmpty) {
+                controller.setView(selection.first);
+              }
+            },
+          ),
         ),
         
         const SizedBox(height: 12),
         
-        // Date range and quick actions
+        // Date range and quick actions with semantic labels
         Row(
           children: [
-            // Date range display chip
+            // Date range display chip with semantic properties
             Expanded(
-              child: InputChip(
-                avatar: const Icon(Icons.calendar_month),
-                label: Text(_formatDateRange(state.range)),
-                onPressed: () => _showDateRangePicker(context, controller, state.range),
+              child: Semantics(
+                button: true,
+                label: 'Date range: ${_formatDateRange(state.range)}',
+                hint: 'Tap to change date range for reports',
+                child: InputChip(
+                  avatar: const Icon(Icons.calendar_month),
+                  label: Text(_formatDateRange(state.range)),
+                  onPressed: () => _showDateRangePicker(context, controller, state.range),
+                ),
               ),
             ),
             
             const SizedBox(width: 8),
             
-            // Quick action buttons
-            IconButton.outlined(
-              onPressed: controller.setToday,
-              icon: const Icon(Icons.today),
-              tooltip: 'Today',
+            // Quick action buttons with semantic properties
+            Semantics(
+              button: true,
+              label: 'Today',
+              hint: 'Set date range to today',
+              child: IconButton.outlined(
+                onPressed: controller.setToday,
+                icon: const Icon(Icons.today),
+                tooltip: 'Today',
+              ),
             ),
             const SizedBox(width: 4),
-            IconButton.outlined(
-              onPressed: controller.setThisWeek,
-              icon: const Icon(Icons.view_week),
-              tooltip: 'This Week',
+            Semantics(
+              button: true,
+              label: 'This Week',
+              hint: 'Set date range to current week',
+              child: IconButton.outlined(
+                onPressed: controller.setThisWeek,
+                icon: const Icon(Icons.view_week),
+                tooltip: 'This Week',
+              ),
             ),
           ],
         ),
@@ -180,19 +200,32 @@ class ReportsScreen extends ConsumerWidget {
         }
         return false;
       },
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: dailyReports.length,
-        itemBuilder: (context, index) {
-          final dailyData = dailyReports[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: ReportTable(
-              title: _formatDayDate(dailyData.date),
-              data: dailyData.report,
-            ),
-          );
-        },
+      child: Semantics(
+        label: 'Daily time reports',
+        hint: '${dailyReports.length} days with time entries',
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: dailyReports.length,
+          itemBuilder: (context, index) {
+            final dailyData = dailyReports[index];
+            final String reportLabel = AccessibilityHelpers.reportLabel(
+              'Daily',
+              _formatDayDate(dailyData.date),
+              dailyData.report.length,
+            );
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Semantics(
+                container: true,
+                label: reportLabel,
+                child: ReportTable(
+                  title: _formatDayDate(dailyData.date),
+                  data: dailyData.report,
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -248,48 +281,66 @@ class ReportsScreen extends ConsumerWidget {
         }
         return false;
       },
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: weeklyReports.length,
-        itemBuilder: (context, index) {
-          final weeklyData = weeklyReports[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-          child: WeeklyReportTable(
-            data: weeklyData.report,
-            weekStart: weeklyData.weekStart,
-          ),
-        );
-      },
+      child: Semantics(
+        label: 'Weekly time reports',
+        hint: '${weeklyReports.length} weeks with time entries',
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: weeklyReports.length,
+          itemBuilder: (context, index) {
+            final weeklyData = weeklyReports[index];
+            final String weekLabel = _formatDayDate(weeklyData.weekStart);
+            final String reportLabel = AccessibilityHelpers.reportLabel(
+              'Weekly',
+              weekLabel,
+              weeklyData.report.length,
+            );
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Semantics(
+                container: true,
+                label: reportLabel,
+                child: WeeklyReportTable(
+                  data: weeklyData.report,
+                  weekStart: weeklyData.weekStart,
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context, String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.bar_chart,
-            size: 64,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+    return Semantics(
+      label: 'No reports available',
+      hint: message,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.bar_chart,
+              size: 64,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Track some time to see reports here.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'Track some time to see reports here.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
