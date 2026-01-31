@@ -40,6 +40,7 @@ class TimerController extends Notifier<TimerState> {
       entries: entries,
       runningEntry: runningEntry,
       activeProjectId: snapshot.projectId,
+      lastActiveProjectId: snapshot.projectId,
       startTime: snapshot.start,
       elapsed: _elapsedFromStart(snapshot.start),
     );
@@ -66,6 +67,7 @@ class TimerController extends Notifier<TimerState> {
     state = state.copyWith(
       runningEntry: runningEntry,
       activeProjectId: projectId,
+      lastActiveProjectId: projectId,
       startTime: now,
       elapsed: _elapsedFromStart(now),
     );
@@ -84,12 +86,14 @@ class TimerController extends Notifier<TimerState> {
     final DateTime now = DateTime.now();
     final TimeEntry completed = state.runningEntry!.copyWith(end: now);
     final List<TimeEntry> updatedEntries = [...state.entries, completed];
+    final String? lastProjectId = state.activeProjectId;
 
     _stopTicker();
     state = state.copyWith(
       entries: updatedEntries,
       runningEntry: null,
       activeProjectId: null,
+      lastActiveProjectId: lastProjectId,
       startTime: null,
       elapsed: Duration.zero,
     );

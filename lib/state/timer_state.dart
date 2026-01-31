@@ -6,6 +6,7 @@ class TimerState {
     required this.entries,
     required this.runningEntry,
     required this.activeProjectId,
+    required this.lastActiveProjectId,
     required this.startTime,
     required this.elapsed,
   });
@@ -13,6 +14,7 @@ class TimerState {
   final List<TimeEntry> entries;
   final TimeEntry? runningEntry;
   final String? activeProjectId;
+  final String? lastActiveProjectId;
   final DateTime? startTime;
   final Duration elapsed;
 
@@ -23,6 +25,7 @@ class TimerState {
       entries: [],
       runningEntry: null,
       activeProjectId: null,
+      lastActiveProjectId: null,
       startTime: null,
       elapsed: Duration.zero,
     );
@@ -32,6 +35,7 @@ class TimerState {
     List<TimeEntry>? entries,
     Object? runningEntry = _unset,
     Object? activeProjectId = _unset,
+    Object? lastActiveProjectId = _unset,
     Object? startTime = _unset,
     Duration? elapsed,
   }) {
@@ -43,6 +47,9 @@ class TimerState {
       activeProjectId: activeProjectId == _unset
           ? this.activeProjectId
           : activeProjectId as String?,
+      lastActiveProjectId: lastActiveProjectId == _unset
+          ? this.lastActiveProjectId
+          : lastActiveProjectId as String?,
       startTime: startTime == _unset
           ? this.startTime
           : startTime as DateTime?,
