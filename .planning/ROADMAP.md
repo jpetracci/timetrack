@@ -113,8 +113,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Optimize touch interactions for mobile and hover states for web
-- [ ] 06-02: Performance tuning and accessibility compliance
+- [x] 06-01-PLAN.md — Platform-adaptive touch and hover interactions
+- [x] 06-02-PLAN.md — Performance optimization and accessibility compliance
 
 ## Progress
 
