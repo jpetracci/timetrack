@@ -101,6 +101,32 @@ class ProjectsController extends Notifier<ProjectsState> {
     await _storage.saveProjects(updated);
   }
 
+  Future<void> archiveProject(String projectId) async {
+    await _setArchived(projectId, true);
+  }
+
+  Future<void> unarchiveProject(String projectId) async {
+    await _setArchived(projectId, false);
+  }
+
+  Future<void> _setArchived(String projectId, bool isArchived) async {
+    bool found = false;
+    final List<Project> updated = state.projects.map((Project project) {
+      if (project.id == projectId) {
+        found = true;
+        return project.copyWith(isArchived: isArchived);
+      }
+      return project;
+    }).toList();
+
+    if (!found) {
+      throw StateError('Project not found');
+    }
+
+    state = state.copyWith(projects: updated);
+    await _storage.saveProjects(updated);
+  }
+
   void setActiveProject(String? projectId) {
     state = state.copyWith(activeProjectId: projectId);
   }
