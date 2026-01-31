@@ -19,19 +19,19 @@ Requirements for initial release. Each maps to roadmap phases.
 
  - [x] **PROJ-01**: User can create new project with name
  - [x] **PROJ-02**: User can add tags to projects for organization
-- [ ] **PROJ-03**: User can edit project name and tags
-- [ ] **PROJ-04**: User can delete individual projects
-- [ ] **PROJ-05**: User can archive projects (hide from main view)
+- [x] **PROJ-03**: User can edit project name and tags
+- [x] **PROJ-04**: User can delete individual projects
+- [x] **PROJ-05**: User can archive projects (hide from main view)
 - [ ] **PROJ-06**: Active project displayed prominently at top of screen
 
 ### Time Display & History
 
 - [ ] **DISP-01**: Time displayed in decimal hours (default 2 decimal places)
 - [ ] **DISP-02**: User can configure decimal precision (1-4 places)
-- [ ] **DISP-03**: User can view project details with complete time history
-- [ ] **DISP-04**: User can edit past time entries (adjust duration)
-- [ ] **DISP-05**: User can delete individual time entries
-- [ ] **DISP-06**: Time history shows start/end times and duration
+- [x] **DISP-03**: User can view project details with complete time history
+- [x] **DISP-04**: User can edit past time entries (adjust duration)
+- [x] **DISP-05**: User can delete individual time entries
+- [x] **DISP-06**: Time history shows start/end times and duration
 
 ### Reporting
 
@@ -120,13 +120,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-03 | Phase 3 | Pending |
 | UX-04 | Phase 3 | Pending |
 | UX-05 | Phase 3 | Pending |
-| PROJ-03 | Phase 4 | Pending |
-| PROJ-04 | Phase 4 | Pending |
-| PROJ-05 | Phase 4 | Pending |
-| DISP-03 | Phase 4 | Pending |
-| DISP-04 | Phase 4 | Pending |
-| DISP-05 | Phase 4 | Pending |
-| DISP-06 | Phase 4 | Pending |
+| PROJ-03 | Phase 4 | Complete |
+| PROJ-04 | Phase 4 | Complete |
+| PROJ-05 | Phase 4 | Complete |
+| DISP-03 | Phase 4 | Complete |
+| DISP-04 | Phase 4 | Complete |
+| DISP-05 | Phase 4 | Complete |
+| DISP-06 | Phase 4 | Complete |
 | REPT-01 | Phase 5 | Pending |
 | REPT-02 | Phase 5 | Pending |
 | REPT-03 | Phase 5 | Pending |
