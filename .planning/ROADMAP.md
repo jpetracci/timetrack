@@ -96,10 +96,10 @@ Plans:
   4. Data migration works smoothly when app schema changes
 **Plans**: 3 plans
 
-Plans:
+ Plans:
 - [x] 05-01-PLAN.md — Report aggregation helpers with tests
-- [ ] 05-02-PLAN.md — Reports screen with daily/weekly tables and date range filtering
-- [ ] 05-03-PLAN.md — Data export (JSON/CSV) and schema migration framework
+- [x] 05-02-PLAN.md — Reports screen with daily/weekly tables and date range filtering
+- [x] 05-03-PLAN.md — Data export (JSON/CSV) and schema migration framework
 
 ### Phase 6: Platform Polish
 **Goal**: Optimize touch/pointer interfaces and app performance
@@ -127,9 +127,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Cross-Platform | 3/3 | Complete | 2026-01-30 |
 | 3. User Interface | 3/3 | Complete | 2026-01-31 |
 | 4. Project Management | 3/3 | Complete | 2026-01-31 |
- | 5. Reporting | 1/3 | In progress | 2026-01-31 |
+ | 5. Reporting | 3/3 | Complete | 2026-01-31 |
 | 6. Platform Polish | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-01-31 after Phase 5 Plan 1 completion*
+*Last updated: 2026-01-31 after Phase 5 completion*
